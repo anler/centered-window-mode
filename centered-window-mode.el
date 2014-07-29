@@ -76,7 +76,7 @@
 (define-minor-mode centered-window-mode
   "Minor mode to cbm on the current buffer."
   :init-value nil
-  :lighter " cbm"
+  :lighter " ⌗"
   :global t
   (if centered-window-mode
       (cwm/setup)
