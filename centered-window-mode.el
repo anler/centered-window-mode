@@ -1,4 +1,4 @@
-;;; centered-window.el --- Center the text when there's only one window
+;;; centered-window-mode.el --- Center the text when there's only one window
 ;;
 ;; Copyright (C) 2014 Anler Hp <http://anler.me>
 ;;
@@ -82,6 +82,6 @@
       (cwm/setup)
     (cwm/teardown)))
 
-(provide 'centered-window)
+(provide 'centered-window-mode)
 
-;;; centered-window.el ends here
+;;; centered-window-mode.el ends here
