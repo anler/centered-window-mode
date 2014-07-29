@@ -3,3 +3,11 @@
 Global minor mode that centers the text of the window when there's only one window in the frame.
 
 As soon as another window is visible the text goes back to normal while more than one window is visible.
+
+You may want to activate `visual-line-mode` if your lines go out of reach.
+
+* Screenshots
+
+[[https://raw.githubusercontent.com/ikame/centered-window-mode/master/img/s-1.png]]
+[[https://raw.githubusercontent.com/ikame/centered-window-mode/master/img/s-2.png]]
+[[https://raw.githubusercontent.com/ikame/centered-window-mode/master/img/s-3.png]]
