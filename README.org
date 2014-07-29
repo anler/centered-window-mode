@@ -1,0 +1,5 @@
+* Centered Window Mode
+
+Global minor mode that centers the text of the window when there's only one window in the frame.
+
+As soon as another window is visible the text goes back to normal while more than one window is visible.
