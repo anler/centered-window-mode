@@ -33,8 +33,7 @@
 ;;
 ;;; Code:
 
-(defvar fringe-background
-  (face-attribute 'fringe :background))
+(defvar fringe-background nil "The background color used for the fringe")
 
 (defun cwm/setup ()
   (add-hook 'window-configuration-change-hook
@@ -51,6 +50,11 @@
   (when fringe-mode
     (cwm/reset)))
 
+(defadvice load-theme (after cwm/set-faces-on-load-theme activate)
+  "Change the default fringe background whenever the theme changes"
+  (message "load theme after here")
+  (cwm/update-fringe-background))
+
 (defun cwm/window-configuration-change ()
   (if (or (> (length (window-list)) 1)
           (null centered-window-mode))
@@ -61,17 +65,23 @@
   (set-fringe-mode
    (/ (- (frame-pixel-width)
          (* 100 (frame-char-width)))
-      2))
-  (let ((fringe-background (face-attribute 'default :background)))
-    (cwm/set-faces)))
+      2)))
 
 (defun cwm/reset ()
-  (set-fringe-mode nil)
-  (cwm/set-faces))
+  (set-fringe-mode nil))
 
 (defun cwm/set-faces ()
   (custom-set-faces
    `(fringe ((t (:background ,fringe-background))))))
+
+(defun cwm/update-fringe-background ()
+  (setq fringe-background (cwm/get-fringe-background))
+  (cwm/set-faces))
+
+(defun cwm/get-fringe-background ()
+  (face-attribute 'default :background))
+
+(cwm/update-fringe-background)
 
 ;;;###autoload
 (define-minor-mode centered-window-mode
