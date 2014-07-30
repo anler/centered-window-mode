@@ -64,7 +64,7 @@
 (defun cwm/center ()
   (set-fringe-mode
    (/ (- (frame-pixel-width)
-         (* 100 (frame-char-width)))
+         (* 110 (frame-char-width)))
       2)))
 
 (defun cwm/reset ()
