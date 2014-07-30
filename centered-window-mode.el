@@ -4,10 +4,9 @@
 ;;
 ;; Author: Anler Hp <http://anler.me>
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "24"))
 ;; Keywords: faces, windows
 ;; URL: https://github.com/ikame/centered-window-mode
-;; Compatibility: GNU Emacs 24.x
+;; Compatibility: GNU Emacs 23.x, GNU Emacs 24.x
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
