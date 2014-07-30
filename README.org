@@ -11,6 +11,38 @@ You may want to activate `visual-line-mode` if your lines go out of reach.
 [[https://raw.githubusercontent.com/ikame/centered-window-mode/master/img/s-1.png]]
 [[https://raw.githubusercontent.com/ikame/centered-window-mode/master/img/s-2.png]]
 [[https://raw.githubusercontent.com/ikame/centered-window-mode/master/img/s-3.png]]
+
+* Installation
+
+** Manual installation
+
+First, download =centered-window-mode.el= in your emacs load path.
+
+Then, to make it available, add this to your configuration file:
+
+#+begin_src emacs-lisp
+(require 'centered-window-mode)
+#+end_src
+
+** Installation via el-get
+
+If you use [[https://github.com/dimitri/el-get][el-get]], the emacs package manager, simply add =centered-window-mode= to your packages list.
+
+* Activation
+
+** On-the-fly
+
+Simply type =M-x centered-window-mode= in any buffer.
+
+** Permanent
+
+To make this permanent, add this to your emacs configuration file:
+
+#+begin_src emacs-lisp
+(require 'centered-window-mode)
+(centered-window-mode t)
+#+end_src
+
 * License
 
 Copyright (C) 2014 Anler Hp
