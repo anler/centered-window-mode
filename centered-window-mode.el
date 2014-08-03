@@ -50,7 +50,13 @@
   :group 'centered-window-mode
   :type 'number)
 
-(defvar cwm/fringe-background nil "The background color used for the fringe")
+(defvar cwm/reset-on-splitting-horizontally
+  t
+  "Wether or not to leave text centered when splitting horizontall")
+
+(defvar cwm/fringe-background
+  nil
+  "The background color used for the fringe")
 
 (defvar cwm/top-overlay nil "Top overlay")
 
@@ -69,16 +75,18 @@
   (when fringe-mode
     (cwm/reset)))
 
+(defadvice split-window-below (before cwm/reset-on-split activate)
+  "Disable cbm-mode presentation (if active) before splitting window"
+  (when (and fringe-mode cwm/reset-on-splitting-horizontally)
+    (cwm/reset)))
+
 (defadvice load-theme (after cwm/set-faces-on-load-theme activate)
   "Change the default fringe background whenever the theme changes"
-  (message "load theme after here")
   (cwm/update-fringe-background))
 
 (defun cwm/window-configuration-change ()
-  (if (or (> (length (window-list)) 1)
-          (null centered-window-mode))
-      (cwm/reset)
-    (cwm/center)))
+  (when (= (length (window-list)) 1)
+      (cwm/center)))
 
 (defun cwm/center ()
   (cwm/center-horizontally)
