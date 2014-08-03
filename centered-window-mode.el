@@ -32,7 +32,27 @@
 ;;
 ;;; Code:
 
-(defvar fringe-background nil "The background color used for the fringe")
+(eval-when-compile (require 'cl))
+
+(defgroup centered-window-mode nil
+  "Keep your text centered when there's only one window."
+  :prefix "cwm/"
+  :group 'tools
+  :link '(url-link :tag "Github" "https://github.com/ikame/centered-window-mode"))
+
+(defcustom cwm/top-padding-factor 0
+  "Top padding factor. Must be between 0 and 1"
+  :group 'centered-window-mode
+  :type 'number)
+
+(defcustom cwm/horizontal-padding-factor .2
+  "Horizontal padding factor. Must be between 0 and 1"
+  :group 'centered-window-mode
+  :type 'number)
+
+(defvar cwm/fringe-background nil "The background color used for the fringe")
+
+(defvar cwm/top-overlay nil "Top overlay")
 
 (defun cwm/setup ()
   (add-hook 'window-configuration-change-hook
@@ -61,13 +81,47 @@
     (cwm/center)))
 
 (defun cwm/center ()
-  (set-fringe-mode
-   (/ (- (frame-pixel-width)
-         (* 110 (frame-char-width)))
-      2)))
+  (cwm/center-horizontally)
+  (when (> cwm/top-padding-factor 0)
+    (cwm/center-vertically)))
+
+(defun cwm/center-horizontally ()
+  (set-fringe-mode (floor (* cwm/horizontal-padding-factor (frame-pixel-width)))))
+
+;   (/ (- (frame-pixel-width)
+;         (* 110 (frame-char-width)))
+;      2)))
+
+(defun cwm/center-vertically ()
+  "Center window vertically using `cwm/top-padding-factor'"
+  (interactive)
+  (cwm/reset-overlay)
+  (let ((window (get-buffer-window)))
+    (setq cwm/top-overlay (cwm/get-overlay window))
+    (overlay-put cwm/top-overlay
+                 'before-string
+                 (cwm/calculate-padding-string cwm/top-padding-factor window))))
+
+(add-hook 'window-scroll-functions (lambda (window start-pos)
+                                     (cwm/center-vertically)))
+
+(defun cwm/get-overlay (window)
+  (let* ((beg (window-start window))
+        (end beg))
+    (make-overlay beg end)))
+
+(defun cwm/calculate-padding-string (factor window &optional char)
+  "Get a string of size used as a padding for WINDOW"
+  (make-string (floor (* factor (window-body-height window)))
+               (or char ?\n)))
 
 (defun cwm/reset ()
-  (set-fringe-mode nil))
+  (set-fringe-mode nil)
+  (cwm/reset-overlay))
+
+(defun cwm/reset-overlay ()
+  (when cwm/top-overlay
+    (delete-overlay cwm/top-overlay)))
 
 (defun cwm/set-faces ()
   (custom-set-faces
