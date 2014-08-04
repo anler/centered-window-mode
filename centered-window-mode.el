@@ -50,9 +50,17 @@
   :group 'centered-window-mode
   :type 'number)
 
-(defvar cwm/reset-on-splitting-horizontally
+(defvar cwm/reset-horizontal-padding-on-splitting-horizontally
   t
-  "Wether or not to leave text centered when splitting horizontall")
+  "Wether or not to leave text centered when splitting horizontally")
+
+(defvar cwm/reset-vertical-padding-on-splitting-horizontally
+  t
+  "Wether or not to leave text vertically-centered when splitting horizontally")
+
+(defvar cwm/reset-vertical-padding-on-splitting-vertically
+  t
+  "Wether or not to leave text vertically-centered when splitting vertically")
 
 (defvar cwm/fringe-background
   nil
@@ -70,15 +78,24 @@
                'cwm/window-configuration-change)
   (cwm/window-configuration-change))
 
-(defadvice split-window-right (before cwm/reset-on-split activate)
+(defadvice split-window-right (before cwm/reset-horizontal-on-split activate)
   "Disable cbm-mode presentation (if active) before splitting window"
   (when fringe-mode
     (cwm/reset)))
 
-(defadvice split-window-below (before cwm/reset-on-split activate)
+(defadvice split-window-right (after cwm/reset-vertical-on-split activate)
   "Disable cbm-mode presentation (if active) before splitting window"
-  (when (and fringe-mode cwm/reset-on-splitting-horizontally)
+  (when cwm/reset-vertical-padding-on-splitting-vertically
     (cwm/reset)))
+
+(defadvice split-window-below (before cwm/reset-horizontal-on-split activate)
+  "Disable cbm-mode presentation (if active) before splitting window"
+  (when (and fringe-mode cwm/reset-horizontal-padding-on-splitting-horizontally)
+    (cwm/reset)))
+
+(defadvice split-window-below (after cwm/reset-vertical-on-split activate)
+  (when cwm/reset-vertical-padding-on-splitting-horizontally
+    (cwm/reset-overlay)))
 
 (defadvice load-theme (after cwm/set-faces-on-load-theme activate)
   "Change the default fringe background whenever the theme changes"
@@ -96,19 +113,16 @@
 (defun cwm/center-horizontally ()
   (set-fringe-mode (floor (* cwm/horizontal-padding-factor (frame-pixel-width)))))
 
-;   (/ (- (frame-pixel-width)
-;         (* 110 (frame-char-width)))
-;      2)))
-
 (defun cwm/center-vertically ()
   "Center window vertically using `cwm/top-padding-factor'"
   (interactive)
   (cwm/reset-overlay)
-  (let ((window (get-buffer-window)))
+  (let* ((window (get-buffer-window))
+         (padding-string (cwm/calculate-padding-string cwm/top-padding-factor window)))
     (setq cwm/top-overlay (cwm/get-overlay window))
-    (overlay-put cwm/top-overlay
-                 'before-string
-                 (cwm/calculate-padding-string cwm/top-padding-factor window))))
+    (overlay-put cwm/top-overlay 'before-string padding-string)
+    ;; (scroll-up-command (length padding-string))
+    ))
 
 (add-hook 'window-scroll-functions (lambda (window start-pos)
                                      (cwm/center-vertically)))
