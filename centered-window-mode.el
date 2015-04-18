@@ -32,6 +32,8 @@
 ;;
 ;;; Code:
 
+(require 'face-remap)
+
 (defvar fringe-background nil "The background color used for the fringe")
 
 (defun cwm/setup ()
