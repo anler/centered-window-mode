@@ -33,6 +33,7 @@
 ;;; Code:
 
 (defvar fringe-background nil "The background color used for the fringe")
+(defvar centered-window-width 110 "text size")
 
 (defun cwm/setup ()
   (add-hook 'window-configuration-change-hook
@@ -42,12 +43,17 @@
 (defun cwm/teardown ()
   (remove-hook 'window-configuration-change-hook
                'cwm/window-configuration-change)
-  (cwm/window-configuration-change))
+  (cwm/reset))
 
 (defadvice split-window-right (before cwm/reset-on-split activate)
-  "Disable cbm-mode presentation (if active) before splitting window"
-  (when fringe-mode
+  "Disable cwm-mode presentation (if active) before splitting window"
+  (when (centered-window-mode)
     (cwm/reset)))
+
+(defadvice split-window-right (after cwm/center-on-split activate)
+  "Restore cwm-mode presentation (if active) after splitting window"
+  (when (centered-window-mode)
+    (cwm/center)))
 
 (defadvice load-theme (after cwm/set-faces-on-load-theme activate)
   "Change the default fringe background whenever the theme changes"
@@ -55,19 +61,26 @@
   (cwm/update-fringe-background))
 
 (defun cwm/window-configuration-change ()
-  (if (or (> (length (window-list)) 1)
-          (null centered-window-mode))
+  (if (null centered-window-mode)
       (cwm/reset)
     (cwm/center)))
 
+(defun cwm/calculate-fringe (&optional win)
+  (let ((fringe_margin (* (frame-char-width)
+                          (/ (- (window-total-width win) centered-window-width) 2))))
+    (if (or (< fringe_margin 0)
+            (< (window-total-width win) centered-window-width))
+        0 fringe_margin)))
+
 (defun cwm/center ()
-  (set-fringe-mode
-   (/ (- (frame-pixel-width)
-         (* 110 (frame-char-width)))
-      2)))
+  (mapcar (lambda(win)
+            (set-window-fringes win (cwm/calculate-fringe win) (cwm/calculate-fringe win)))
+            (window-list nil 0)))
 
 (defun cwm/reset ()
-  (set-fringe-mode nil))
+  (mapcar (lambda(win)
+            (set-window-fringes win 0 0))
+          (window-list nil 0)))
 
 (defun cwm/set-faces ()
   (custom-set-faces
@@ -86,11 +99,13 @@
 (define-minor-mode centered-window-mode
   "Minor mode to cbm on the current buffer."
   :init-value nil
-  :lighter " ⌗"
+  :lighter " #"
   :global t
-  (if centered-window-mode
-      (cwm/setup)
-    (cwm/teardown)))
+  (if (window-system)
+      (if centered-window-mode
+          (cwm/setup)
+        (cwm/teardown))
+    (message "Currently not supported in the terminal")))
 
 (provide 'centered-window-mode)
 
