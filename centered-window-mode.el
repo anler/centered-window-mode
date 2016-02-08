@@ -85,8 +85,9 @@ mode won't activate in that buffer.")
 
 The *scratch* buffer although special, is treated as not special
 by this function."
-  (let ((buffname (buffer-name buff)))
-    (and (s-starts-with-p "*" buffname)
+  (let ((buffname (s-trim (buffer-name buff))))
+    (and buffname
+         (s-starts-with-p "*" buffname)
          (not (string= "*scratch*" buffname)))))
 
 (defun cwm/ignore-buffer-p (buff)
