@@ -1,12 +1,13 @@
 ;;; centered-window-mode.el --- Center the text when there's only one window
 ;;
-;; Copyright (C) 2014 Anler Hp <http://anler.me>
-;;
-;; Author: Anler Hp <http://anler.me>
-;; Version: 0.0.1
+;; Author: Anler Hp   <http://anler.me>
+;; Version: 1.0.0
+;; Contributors:
+;;    Mickael Kerjean <http://github.com/mickael-kerjean>
+;;    Pierre Lecocq   <http://github.com/pierre-lecocq>
 ;; Keywords: faces, windows
-;; URL: https://github.com/ikame/centered-window-mode
-;; Compatibility: GNU Emacs 23.x, GNU Emacs 24.x
+;; URL: https://github.com/anler/centered-window-mode
+;; Compatibility: GNU Emacs 24.x
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -28,14 +29,46 @@
 ;; Enable centered-window-mode and your text is going to be centered when there's
 ;; only one window in the frame.
 ;;
-;;; Changes Log:
+;; Customizable options are:
+;;  cwm-fringe-background
+;;  cwm-lighter
+;;  cwm-centered-window-width
+;;  cwm-ignore-buffer-predicates
 ;;
 ;;; Code:
-
 (require 'face-remap)
+(require 's)
 
-(defvar fringe-background nil "The background color used for the fringe")
-(defvar centered-window-width 110 "text size")
+(defgroup centered-window-mode nil
+  "Center text in buffers."
+  :group 'customize)
+
+(defcustom cwm-fringe-background
+  nil
+  "The background color used for the fringe.
+If not set is automatically deducted."
+  :group 'centered-window-mode)
+
+(defcustom cwm-lighter
+  " #"
+  "Mode's lighter used in the mode line."
+  :group 'centered-window-mode)
+
+(defcustom cwm-centered-window-width
+  110
+  "Minimum line length required to apply the margins."
+  :group 'centered-window-mode)
+
+(defcustom cwm-ignore-buffer-predicates
+  (list #'cwm/special-buffer-p)
+  "List of predicate functions.
+Each is run with current buffer and if it returns 't the
+mode won't activate in that buffer.")
+
+(defcustom centered-window-mode-hooks
+  nil
+  "Hooks to run everytime the text is centered (be careful)."
+  :group 'centered-window-mode)
 
 (defun cwm/setup ()
   (add-hook 'window-configuration-change-hook
@@ -46,6 +79,22 @@
   (remove-hook 'window-configuration-change-hook
                'cwm/window-configuration-change)
   (cwm/reset))
+
+(defun cwm/special-buffer-p (buff)
+  "Return 't if BUFF buffer name is special (starts with an *).
+
+The *scratch* buffer although special, is treated as not special
+by this function."
+  (let ((buffname (s-trim (buffer-name buff))))
+    (and buffname
+         (s-starts-with-p "*" buffname)
+         (not (string= "*scratch*" buffname)))))
+
+(defun cwm/ignore-buffer-p (buff)
+  "Check if BUFF should be ignored when activating the mode."
+  (not (null (delq nil (mapcar (lambda (predicate)
+                                 (funcall predicate buff))
+                               cwm-ignore-buffer-predicates)))))
 
 (defadvice split-window-right (before cwm/reset-on-split activate)
   "Disable cwm-mode presentation (if active) before splitting window"
@@ -69,15 +118,19 @@
 
 (defun cwm/calculate-fringe (&optional win)
   (let ((fringe_margin (* (frame-char-width)
-                          (/ (- (window-total-width win) centered-window-width) 2))))
+                          (/ (- (window-total-width win) cwm-centered-window-width) 2))))
     (if (or (< fringe_margin 0)
-            (< (window-total-width win) centered-window-width))
+            (< (window-total-width win) cwm-centered-window-width))
         0 fringe_margin)))
 
 (defun cwm/center ()
   (mapcar (lambda(win)
-            (set-window-fringes win (cwm/calculate-fringe win) (cwm/calculate-fringe win)))
-            (window-list nil 0)))
+            (let ((winbuff (window-buffer win))
+                  (winfringe (cwm/calculate-fringe win)))
+              (unless (cwm/ignore-buffer-p winbuff)
+                (set-window-fringes win winfringe winfringe)
+                (run-hooks 'centered-window-mode-hooks))))
+          (window-list nil 0)))
 
 (defun cwm/reset ()
   (mapcar (lambda(win)
@@ -86,10 +139,10 @@
 
 (defun cwm/set-faces ()
   (custom-set-faces
-   `(fringe ((t (:background ,fringe-background))))))
+   `(fringe ((t (:background ,cwm-fringe-background))))))
 
 (defun cwm/update-fringe-background ()
-  (setq fringe-background (cwm/get-fringe-background))
+  (setq cwm-fringe-background (cwm/get-fringe-background))
   (cwm/set-faces))
 
 (defun cwm/get-fringe-background ()
@@ -99,15 +152,15 @@
 
 ;;;###autoload
 (define-minor-mode centered-window-mode
-  "Minor mode to cbm on the current buffer."
+  "Minor mode to center text on the current buffer."
   :init-value nil
-  :lighter " #"
+  :lighter cwm-lighter
   :global t
   (if (window-system)
       (if centered-window-mode
           (cwm/setup)
         (cwm/teardown))
-    (message "Currently not supported in the terminal")))
+    (message "Centered window mode is currently not supported in the terminal")))
 
 (provide 'centered-window-mode)
 
