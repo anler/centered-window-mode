@@ -32,6 +32,8 @@
 ;;
 ;;; Code:
 
+(require 'face-remap)
+
 (defvar fringe-background nil "The background color used for the fringe")
 (defvar centered-window-width 110 "text size")
 
