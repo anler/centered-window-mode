@@ -7,6 +7,7 @@
 ;;    Pierre Lecocq   <http://github.com/pierre-lecocq>
 ;; Keywords: faces, windows
 ;; URL: https://github.com/anler/centered-window-mode
+;; Package-Requires: ((s "1.10.0"))
 ;; Compatibility: GNU Emacs 24.x
 ;;
 ;; This file is NOT part of GNU Emacs.
