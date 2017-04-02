@@ -1,11 +1,11 @@
-;;; centered-window-mode.el --- Center the text when there's only one window
+;;; centered-window-mode.el --- Center the text when there's only one window  -*- lexical-binding: t; -*-
 ;;
-;; Author: Anler Hp   <http://anler.me>
+;; Author: Anler Hernández Peral <inbox+emacs@anler.me>
 ;; Version: 1.0.0
 ;; Contributors:
 ;;    Mickael Kerjean <http://github.com/mickael-kerjean>
 ;;    Pierre Lecocq   <http://github.com/pierre-lecocq>
-;; Keywords: faces, windows
+;; Keywords: faces windows
 ;; URL: https://github.com/anler/centered-window-mode
 ;; Package-Requires: ((s "1.10.0"))
 ;; Compatibility: GNU Emacs 24.x
@@ -37,21 +37,14 @@
 ;;  cwm-ignore-buffer-predicates
 ;;
 ;;; Code:
-(require 'face-remap)
-(require 's)
+(require 'cl)
 
 (defgroup centered-window-mode nil
   "Center text in buffers."
   :group 'customize)
 
-(defcustom cwm-fringe-background
-  nil
-  "The background color used for the fringe.
-If not set is automatically deducted."
-  :group 'centered-window-mode)
-
 (defcustom cwm-lighter
-  " #"
+  " cwm"
   "Mode's lighter used in the mode line."
   :group 'centered-window-mode)
 
@@ -60,8 +53,18 @@ If not set is automatically deducted."
   "Minimum line length required to apply the margins."
   :group 'centered-window-mode)
 
+(defcustom cwm-use-vertical-padding
+  nil
+  "Whether or not use experimental vertical padding."
+  :group 'centered-window-mode)
+
+(defcustom cwm-frame-internal-border
+  70
+  "Frame internal border to use when vertical padding is used."
+  :group 'centered-window-mode)
+
 (defcustom cwm-ignore-buffer-predicates
-  (list #'cwm/special-buffer-p)
+  (list #'cwm-special-buffer-p)
   "List of predicate functions.
 Each is run with current buffer and if it returns 't the
 mode won't activate in that buffer.")
@@ -71,98 +74,106 @@ mode won't activate in that buffer.")
   "Hooks to run everytime the text is centered (be careful)."
   :group 'centered-window-mode)
 
-(defun cwm/setup ()
-  (add-hook 'window-configuration-change-hook
-            'cwm/window-configuration-change)
-  (cwm/window-configuration-change))
+(defadvice load-theme (after cwm-set-faces-on-load-theme activate)
+  "Change the default fringe background whenever the theme changes."
+  (cwm-update-fringe-background))
 
-(defun cwm/teardown ()
-  (remove-hook 'window-configuration-change-hook
-               'cwm/window-configuration-change)
-  (cwm/reset))
+(defun cwm-ignore-window-p (window)
+  "Check if BUFF should be ignored when activating the mode."
+  (not
+   (null
+    (delq nil
+          (mapcar (lambda (predicate)
+                    (funcall predicate (window-buffer window)))
+                  cwm-ignore-buffer-predicates)))))
 
-(defun cwm/special-buffer-p (buff)
+(defun cwm-special-buffer-p (buffer)
   "Return 't if BUFF buffer name is special (starts with an *).
 
 The *scratch* buffer although special, is treated as not special
 by this function."
-  (let ((buffname (s-trim (buffer-name buff))))
+  (let ((buffname (s-trim (buffer-name buffer))))
     (and buffname
          (s-starts-with-p "*" buffname)
          (not (string= "*scratch*" buffname)))))
 
-(defun cwm/ignore-buffer-p (buff)
-  "Check if BUFF should be ignored when activating the mode."
-  (not (null (delq nil (mapcar (lambda (predicate)
-                                 (funcall predicate buff))
-                               cwm-ignore-buffer-predicates)))))
-
-(defadvice split-window-right (before cwm/reset-on-split activate)
-  "Disable cwm-mode presentation (if active) before splitting window"
-  (when (centered-window-mode)
-    (cwm/reset)))
-
-(defadvice split-window-right (after cwm/center-on-split activate)
-  "Restore cwm-mode presentation (if active) after splitting window"
-  (when (centered-window-mode)
-    (cwm/center)))
-
-(defadvice load-theme (after cwm/set-faces-on-load-theme activate)
-  "Change the default fringe background whenever the theme changes"
-  (message "load theme after here")
-  (cwm/update-fringe-background))
-
-(defun cwm/window-configuration-change ()
-  (if (null centered-window-mode)
-      (cwm/reset)
-    (cwm/center)))
-
-(defun cwm/calculate-fringe (&optional win)
-  (let ((fringe_margin (* (frame-char-width)
-                          (/ (- (window-total-width win) cwm-centered-window-width) 2))))
-    (if (or (< fringe_margin 0)
-            (< (window-total-width win) cwm-centered-window-width))
-        0 fringe_margin)))
-
-(defun cwm/center ()
-  (mapcar (lambda(win)
-            (let ((winbuff (window-buffer win))
-                  (winfringe (cwm/calculate-fringe win)))
-              (unless (cwm/ignore-buffer-p winbuff)
-                (set-window-fringes win winfringe winfringe)
-                (run-hooks 'centered-window-mode-hooks))))
-          (window-list nil 0)))
-
-(defun cwm/reset ()
-  (mapcar (lambda(win)
-            (set-window-fringes win 0 0))
-          (window-list nil 0)))
-
-(defun cwm/set-faces ()
+(defun cwm-update-fringe-background ()
   (custom-set-faces
-   `(fringe ((t (:background ,cwm-fringe-background))))))
+   `(fringe ((t (:background ,(face-attribute 'default :background)))))))
 
-(defun cwm/update-fringe-background ()
-  (setq cwm-fringe-background (cwm/get-fringe-background))
-  (cwm/set-faces))
+(defun cwm-turn-on ()
+  (add-hook 'window-configuration-change-hook #'cwm-center-windows)
+  (add-hook 'window-configuration-change-hook #'cwm-center-frame)
+  (cwm-center-windows)
+  (when cwm-use-vertical-padding
+    (set-frame-parameter nil 'internal-border-width cwm-frame-internal-border)))
 
-(defun cwm/get-fringe-background ()
-  (face-attribute 'default :background))
+(defun cwm-turn-off ()
+  (remove-hook 'window-configuration-change-hook #'cwm-center-windows)
+  (cwm-center-windows)
+  (set-frame-parameter nil 'internal-border-width 0))
 
-(cwm/update-fringe-background)
+(defun cwm-center-windows ()
+  (let ((windows (window-list nil :exclude-minibuffer)))
+    (mapc #'cwm-center-window-instructions
+          (mapcar #'cwm-centering-instructions
+                  (cl-remove-if #'cwm-ignore-window-p windows))
+          )
+    (run-hooks 'centered-window-mode-hooks)))
+
+(defstruct cwm-centering-instructions
+  window
+  left-width
+  right-width)
+
+(defun cwm-center-window-instructions (instructions)
+  (let* ((window (cwm-centering-instructions-window instructions))
+         (frame (window-frame window)))
+    (set-window-fringes window
+                        (cwm-centering-instructions-left-width instructions)
+                        (cwm-centering-instructions-right-width instructions))))
+
+(defun cwm-centering-instructions (window)
+  (let ((buffer (window-buffer window))
+        (widths (cwm-calculate-appropriate-fringe-widths window)))
+    (make-cwm-centering-instructions
+     :window window
+     :left-width (car widths)
+     :right-width (cdr widths))))
+
+(defun cwm-calculate-appropriate-fringe-widths (window)
+  (let* ((mode-active-p (with-current-buffer (window-buffer window) (cwm-activated-p)))
+         (pixel (frame-char-width (window-frame window)))
+         (n  (if mode-active-p
+                 (/ (max (- (window-total-width window) cwm-centered-window-width) 0)
+                    2)
+               0))
+         (ratio (/ (* n 40) 100))
+         (left-width (* pixel (if (> n 0) (+ n ratio) n)))
+         (right-width (* pixel (if (> n 0) (- n ratio) n)))
+         )
+    `(,left-width . ,right-width)))
+
+(defun cwm-activated-p ()
+  centered-window-mode)
+
+;;;###autoload
+(defun centered-window-mode-toggle ()
+  (if centered-window-mode
+      (centered-window-mode -1)
+    (centered-window-mode +1)))
 
 ;;;###autoload
 (define-minor-mode centered-window-mode
-  "Minor mode to center text on the current buffer."
+  "Minor mode to center text on the current buffer"
   :init-value nil
   :lighter cwm-lighter
-  :global t
-  (if (window-system)
-      (if centered-window-mode
-          (cwm/setup)
-        (cwm/teardown))
-    (message "Centered window mode is currently not supported in the terminal")))
+  (if centered-window-mode (cwm-turn-on) (cwm-turn-off))
+  )
 
 (provide 'centered-window-mode)
-
 ;;; centered-window-mode.el ends here
+;; (frame-height)
+;; (frame-parameter nil 'internal-border-width)
+;; (frame-char-width)
+;; (/ 67 9)
