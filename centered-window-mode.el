@@ -167,6 +167,7 @@ by this function."
 (define-minor-mode centered-window-mode
   "Minor mode to center text on the current buffer"
   :init-value nil
+  :global t
   :lighter cwm-lighter
   (if centered-window-mode (cwm-turn-on) (cwm-turn-off))
   )
