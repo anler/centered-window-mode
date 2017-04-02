@@ -1,10 +1,9 @@
 * Centered Window Mode
 
-Global minor mode that centers the text of the window when there's only one window in the frame.
+  Global minor mode that centers the text of the window. If another
+  window is visible the text goes back to normal if its width is less than =cwm-centered-window-width=.
 
-As soon as another window is visible the text goes back to normal while more than one window is visible.
-
-You may want to activate `visual-line-mode` if your lines go out of reach.
+  You may want to activate =visual-line-mode= if your lines go out of reach.
 
 * Screenshots
 
@@ -28,6 +27,14 @@ Then, to make it available, add this to your configuration file:
 
 If you use [[https://github.com/dimitri/el-get][el-get]], the emacs package manager, simply add =centered-window-mode= to your packages list.
 
+** Installation via use-package
+
+If you use [[https://github.com/jwiegley/use-package][use-package]], simply add the following to your init file.
+
+#+BEGIN_SRC elisp
+(use-package centered-window-mode :ensure t)
+#+END_SRC
+
 * Activation
 
 ** On-the-fly
@@ -42,6 +49,10 @@ To make this permanent, add this to your emacs configuration file:
 (require 'centered-window-mode)
 (centered-window-mode t)
 #+end_src
+
+* Vertical padding
+
+Adding vertical padding to an Emacs window is kind of hard, I have tried a lot of different solutions but most of them add a lot of complexity and source of bugs to the mode. Currently there are the options =cwm-use-vertical-padding= (default =nil=, set to =t= if you want this feature) and =cwm-frame-internal-border= (default =70=) to add some padding to the frame, it's far from ideal but I have found it at most acceptable for most of the use cases where I need this feature.
 
 * License
 
