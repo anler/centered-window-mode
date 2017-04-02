@@ -1,10 +1,12 @@
 ;;; centered-window-mode.el --- Center the text when there's only one window  -*- lexical-binding: t; -*-
 ;;
 ;; Author: Anler Hernández Peral <inbox+emacs@anler.me>
-;; Version: 1.1.1
+;; Version: 1.1.2
 ;; Contributors:
-;;    Mickael Kerjean <http://github.com/mickael-kerjean>
-;;    Pierre Lecocq   <http://github.com/pierre-lecocq>
+;;    Mickael Kerjean <https://github.com/mickael-kerjean>
+;;    Pierre Lecocq   <https://github.com/pierre-lecocq>
+;;    Syohei YOSHIDA  <https://github.com/syohex>
+;;    Lars Tveito     <https://github.com/larstvei>
 ;; Keywords: faces windows
 ;; URL: https://github.com/anler/centered-window-mode
 ;; Package-Requires: ((s "1.10.0"))
@@ -45,7 +47,7 @@
   :group 'customize)
 
 (defcustom cwm-lighter
-  " cwm"
+  " #"
   "Mode's lighter used in the mode line."
   :group 'centered-window-mode)
 
@@ -142,7 +144,7 @@ by this function."
      :right-width (cdr widths))))
 
 (defun cwm-calculate-appropriate-fringe-widths (window)
-  (let* ((mode-active-p (with-current-buffer (window-buffer window) (cwm-activated-p)))
+  (let* ((mode-active-p (with-current-buffer (window-buffer window) centered-window-mode))
          (pixel (frame-char-width (window-frame window)))
          (n  (if mode-active-p
                  (/ (max (- (window-total-width window) cwm-centered-window-width) 0)
@@ -153,9 +155,6 @@ by this function."
          (right-width (* pixel (if (> n 0) (- n ratio) n)))
          )
     `(,left-width . ,right-width)))
-
-(defun cwm-activated-p ()
-  centered-window-mode)
 
 ;;;###autoload
 (defun centered-window-mode-toggle ()
@@ -174,7 +173,3 @@ by this function."
 
 (provide 'centered-window-mode)
 ;;; centered-window-mode.el ends here
-;; (frame-height)
-;; (frame-parameter nil 'internal-border-width)
-;; (frame-char-width)
-;; (/ 67 9)
