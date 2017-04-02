@@ -1,7 +1,7 @@
 ;;; centered-window-mode.el --- Center the text when there's only one window  -*- lexical-binding: t; -*-
 ;;
 ;; Author: Anler Hernández Peral <inbox+emacs@anler.me>
-;; Version: 1.1.0
+;; Version: 1.1.1
 ;; Contributors:
 ;;    Mickael Kerjean <http://github.com/mickael-kerjean>
 ;;    Pierre Lecocq   <http://github.com/pierre-lecocq>
@@ -31,13 +31,14 @@
 ;; only one window in the frame.
 ;;
 ;; Customizable options are:
-;;  cwm-fringe-background
 ;;  cwm-lighter
 ;;  cwm-centered-window-width
 ;;  cwm-ignore-buffer-predicates
 ;;
 ;;; Code:
 (require 'cl)
+(require 'face-remap)
+(require 's)
 
 (defgroup centered-window-mode nil
   "Center text in buffers."
@@ -103,7 +104,6 @@ by this function."
 
 (defun cwm-turn-on ()
   (add-hook 'window-configuration-change-hook #'cwm-center-windows)
-  (add-hook 'window-configuration-change-hook #'cwm-center-frame)
   (cwm-center-windows)
   (when cwm-use-vertical-padding
     (set-frame-parameter nil 'internal-border-width cwm-frame-internal-border)))
