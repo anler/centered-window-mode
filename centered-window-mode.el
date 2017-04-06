@@ -66,6 +66,13 @@
   "Frame internal border to use when vertical padding is used."
   :group 'centered-window-mode)
 
+(defcustom cwm-left-fringe-ratio
+  40
+  "Ratio by which the left fringe is padded more than the right.
+Should be a value between 0 and 100. A value of 0 means off."
+  :group
+  'centered-window-mode)
+
 (defcustom cwm-ignore-buffer-predicates
   (list #'cwm-special-buffer-p)
   "List of predicate functions.
@@ -150,10 +157,9 @@ by this function."
                  (/ (max (- (window-total-width window) cwm-centered-window-width) 0)
                     2)
                0))
-         (ratio (/ (* n 40) 100))
+         (ratio (/ (* n cwm-left-fringe-ratio) 100))
          (left-width (* pixel (if (> n 0) (+ n ratio) n)))
-         (right-width (* pixel (if (> n 0) (- n ratio) n)))
-         )
+         (right-width (* pixel (if (> n 0) (- n ratio) n))))
     `(,left-width . ,right-width)))
 
 ;;;###autoload
