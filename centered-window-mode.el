@@ -36,6 +36,10 @@
 ;;  cwm-lighter
 ;;  cwm-centered-window-width
 ;;  cwm-ignore-buffer-predicates
+;;  cwm-incremental-padding
+;;  cwm-incremental-padding-%
+;;  cwm-use-vertical-padding
+;;  cwm-frame-internal-border
 ;;
 ;;; Code:
 (require 'cl)
@@ -58,6 +62,18 @@
   :group 'centered-window-mode
   :type 'integer)
 
+(defcustom cwm-incremental-padding
+  nil
+  "If t even when the window's width is less than `cwm-centered-window-width' a padding of `cwm-incremental-padding-%' will be applied to each side."
+  :group 'centered-window-mode
+  :type 'boolean)
+
+(defcustom cwm-incremental-padding-%
+	0
+  "Incremental padding percentage to use when `cwm-incremental-padding' is t."
+  :group 'centered-window-mode
+  :type 'integer)
+
 (defcustom cwm-use-vertical-padding
   nil
   "Whether or not use experimental vertical padding."
@@ -65,7 +81,7 @@
   :type 'boolean)
 
 (defcustom cwm-frame-internal-border
-  70
+  5
   "Frame internal border to use when vertical padding is used."
   :group 'centered-window-mode
   :type 'integer)
@@ -163,9 +179,15 @@ by this function."
 (defun cwm-calculate-appropriate-fringe-widths (window)
   (let* ((mode-active-p (with-current-buffer (window-buffer window) centered-window-mode))
          (pixel (frame-char-width (window-frame window)))
+         (window-width (window-total-width window))
          (n  (if mode-active-p
-                 (/ (max (- (window-total-width window) cwm-centered-window-width) 0)
-                    2)
+               (max
+                (/ (- window-width cwm-centered-window-width)
+                   2)
+                (if cwm-incremental-padding
+                    (/ (* window-width cwm-incremental-padding-%)
+                       100)
+                  0))
                0))
          (ratio (/ (* n cwm-left-fringe-ratio) 100))
          (left-width (* pixel (if (> n 0) (+ n ratio) n)))
