@@ -87,7 +87,7 @@
   :type 'integer)
 
 (defcustom cwm-left-fringe-ratio
-  40
+  0
   "Ratio by which the left fringe is padded more than the right.
 Should be a value between 0 and 100. A value of 0 means off."
   :group 'centered-window-mode
