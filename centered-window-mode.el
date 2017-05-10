@@ -1,7 +1,7 @@
 ;;; centered-window-mode.el --- Center the text when there's only one window  -*- lexical-binding: t; -*-
 ;;
 ;; Author: Anler Hernández Peral <inbox+emacs@anler.me>
-;; Version: 1.2.0
+;; Version: 1.3.0
 ;; Contributors:
 ;;    Mickael Kerjean <https://github.com/mickael-kerjean>
 ;;    Pierre Lecocq   <https://github.com/pierre-lecocq>
@@ -45,7 +45,8 @@
 
 (defgroup centered-window-mode nil
   "Center text in windows."
-  :group 'windows)
+  :group 'windows
+  :prefix "cwm-")
 
 (defcustom cwm-lighter
   " #"
@@ -91,7 +92,10 @@ mode won't activate in that buffer."
   :group 'centered-window-mode
   :type '(list function))
 
-(defcustom centered-window-mode-hooks
+(define-obsolete-variable-alias
+  'centered-window-mode-hooks
+  'cwm-hooks "1.3.0")
+(defcustom cwm-hooks
   nil
   "Hooks to run everytime the text is centered (be careful)."
   :group 'centered-window-mode
