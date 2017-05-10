@@ -43,7 +43,7 @@
 (require 's)
 
 (defgroup centered-window-mode nil
-  "Center text in buffers."
+  "Center text in windows."
   :group 'windows)
 
 (defcustom cwm-lighter
