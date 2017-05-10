@@ -38,6 +38,7 @@
 ;;  cwm-ignore-buffer-predicates
 ;;
 ;;; Code:
+
 (eval-when-compile
   (require 'cl-lib))
 (require 'face-remap)
@@ -58,18 +59,21 @@
   110
   "Minimum line length required to apply the margins."
   :group 'centered-window-mode
+  :set #'cwm--set-and-recenter-windows
   :type 'integer)
 
 (defcustom cwm-use-vertical-padding
   nil
   "Whether or not use experimental vertical padding."
   :group 'centered-window-mode
+  :set #'cwm--set-and-recenter-windows
   :type 'boolean)
 
 (defcustom cwm-frame-internal-border
   70
   "Frame internal border to use when vertical padding is used."
   :group 'centered-window-mode
+  :set #'cwm--set-and-recenter-windows
   :type 'integer)
 
 (defcustom cwm-left-fringe-ratio
@@ -77,6 +81,7 @@
   "Ratio by which the left fringe is padded more than the right.
 Should be a value between 0 and 100. A value of 0 means off."
   :group 'centered-window-mode
+  :set #'cwm--set-and-recenter-windows
   :type '(integer
           :validate (lambda (widget)
                       (let ((ratio (widget-value widget)))
@@ -100,6 +105,18 @@ mode won't activate in that buffer."
   "Hooks to run every time window is centered (be careful)."
   :group 'centered-window-mode
   :type 'hook)
+
+(defun cwm--set-and-recenter-windows (var val)
+  "Set customizable variable VAR to VAL and recenter windows.
+
+All windows in all frames are recentered.
+
+This is intended for use as the `setfunction' of a
+`defcustom'. See Info node `(elisp) Variable Definitions'."
+  (set-default var val)
+  (dolist (frame (frame-list))
+    (with-selected-frame frame
+      (cwm-center-windows))))
 
 (defadvice load-theme (after cwm-set-faces-on-load-theme activate)
   "Change the default fringe background whenever the theme changes."
