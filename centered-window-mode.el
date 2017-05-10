@@ -93,7 +93,8 @@ mode won't activate in that buffer."
 (defcustom centered-window-mode-hooks
   nil
   "Hooks to run everytime the text is centered (be careful)."
-  :group 'centered-window-mode)
+  :group 'centered-window-mode
+  :type 'hook)
 
 (defadvice load-theme (after cwm-set-faces-on-load-theme activate)
   "Change the default fringe background whenever the theme changes."
@@ -146,15 +147,13 @@ by this function."
   right-width)
 
 (defun cwm-center-window-instructions (instructions)
-  (let* ((window (cwm-centering-instructions-window instructions))
-         (frame (window-frame window)))
+  (let* ((window (cwm-centering-instructions-window instructions)))
     (set-window-fringes window
                         (cwm-centering-instructions-left-width instructions)
                         (cwm-centering-instructions-right-width instructions))))
 
 (defun cwm-centering-instructions (window)
-  (let ((buffer (window-buffer window))
-        (widths (cwm-calculate-appropriate-fringe-widths window)))
+  (let ((widths (cwm-calculate-appropriate-fringe-widths window)))
     (make-cwm-centering-instructions
      :window window
      :left-width (car widths)
