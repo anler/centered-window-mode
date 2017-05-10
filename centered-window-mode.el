@@ -38,7 +38,8 @@
 ;;  cwm-ignore-buffer-predicates
 ;;
 ;;; Code:
-(require 'cl)
+(eval-when-compile
+  (require 'cl-lib))
 (require 'face-remap)
 (require 'subr-x)
 
@@ -140,7 +141,7 @@ by this function."
                   (cl-remove-if #'cwm-ignore-window-p windows)))
     (run-hooks 'centered-window-mode-hooks)))
 
-(defstruct cwm-centering-instructions
+(cl-defstruct cwm-centering-instructions
   window
   left-width
   right-width)
