@@ -49,35 +49,46 @@
 (defcustom cwm-lighter
   " #"
   "Mode's lighter used in the mode line."
-  :group 'centered-window-mode)
+  :group 'centered-window-mode
+  :type 'string)
 
 (defcustom cwm-centered-window-width
   110
   "Minimum line length required to apply the margins."
-  :group 'centered-window-mode)
+  :group 'centered-window-mode
+  :type 'integer)
 
 (defcustom cwm-use-vertical-padding
   nil
   "Whether or not use experimental vertical padding."
-  :group 'centered-window-mode)
+  :group 'centered-window-mode
+  :type 'boolean)
 
 (defcustom cwm-frame-internal-border
   70
   "Frame internal border to use when vertical padding is used."
-  :group 'centered-window-mode)
+  :group 'centered-window-mode
+  :type 'integer)
 
 (defcustom cwm-left-fringe-ratio
   40
   "Ratio by which the left fringe is padded more than the right.
 Should be a value between 0 and 100. A value of 0 means off."
-  :group
-  'centered-window-mode)
+  :group 'centered-window-mode
+  :type '(integer
+          :validate (lambda (widget)
+                      (let ((ratio (widget-value widget)))
+                        (unless (<= 0 ratio 100)
+                          (widget-put widget :error (format "Invalid ratio (0-100): '%s'" ratio))
+                          widget)))))
 
 (defcustom cwm-ignore-buffer-predicates
   (list #'cwm-special-buffer-p)
   "List of predicate functions.
 Each is run with current buffer and if it returns 't the
-mode won't activate in that buffer.")
+mode won't activate in that buffer."
+  :group 'centered-window-mode
+  :type '(list function))
 
 (defcustom centered-window-mode-hooks
   nil
