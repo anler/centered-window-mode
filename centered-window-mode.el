@@ -137,8 +137,7 @@ by this function."
   (let ((windows (window-list nil :exclude-minibuffer)))
     (mapc #'cwm-center-window-instructions
           (mapcar #'cwm-centering-instructions
-                  (cl-remove-if #'cwm-ignore-window-p windows))
-          )
+                  (cl-remove-if #'cwm-ignore-window-p windows)))
     (run-hooks 'centered-window-mode-hooks)))
 
 (defstruct cwm-centering-instructions
