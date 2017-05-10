@@ -97,7 +97,7 @@ mode won't activate in that buffer."
   'cwm-hooks "1.3.0")
 (defcustom cwm-hooks
   nil
-  "Hooks to run everytime the text is centered (be careful)."
+  "Hooks to run every time window is centered (be careful)."
   :group 'centered-window-mode
   :type 'hook)
 
