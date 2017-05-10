@@ -1,7 +1,7 @@
 ;;; centered-window-mode.el --- Center the text when there's only one window  -*- lexical-binding: t; -*-
 ;;
 ;; Author: Anler Hernández Peral <inbox+emacs@anler.me>
-;; Version: 1.1.2
+;; Version: 1.2.0
 ;; Contributors:
 ;;    Mickael Kerjean <https://github.com/mickael-kerjean>
 ;;    Pierre Lecocq   <https://github.com/pierre-lecocq>
@@ -9,7 +9,7 @@
 ;;    Lars Tveito     <https://github.com/larstvei>
 ;; Keywords: faces windows
 ;; URL: https://github.com/anler/centered-window-mode
-;; Package-Requires: ((s "1.10.0"))
+;; Package-Requires: ((emacs "24.4"))
 ;; Compatibility: GNU Emacs 24.x
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -40,7 +40,7 @@
 ;;; Code:
 (require 'cl)
 (require 'face-remap)
-(require 's)
+(require 'subr-x)
 
 (defgroup centered-window-mode nil
   "Center text in windows."
@@ -113,9 +113,9 @@ mode won't activate in that buffer."
 
 The *scratch* buffer although special, is treated as not special
 by this function."
-  (let ((buffname (s-trim (buffer-name buffer))))
+  (let ((buffname (string-trim (buffer-name buffer))))
     (and buffname
-         (s-starts-with-p "*" buffname)
+         (string-prefix-p "*" buffname)
          (not (string= "*scratch*" buffname)))))
 
 (defun cwm-update-fringe-background ()
