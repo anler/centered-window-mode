@@ -183,8 +183,7 @@ by this function."
   :init-value nil
   :global t
   :lighter cwm-lighter
-  (if centered-window-mode (cwm-turn-on) (cwm-turn-off))
-  )
+  (if centered-window-mode (cwm-turn-on) (cwm-turn-off)))
 
 (provide 'centered-window-mode)
 ;;; centered-window-mode.el ends here
