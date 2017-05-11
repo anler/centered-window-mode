@@ -59,6 +59,7 @@
   110
   "Minimum line length required to apply the margins."
   :group 'centered-window-mode
+  :initialize #'custom-initialize-default
   :set #'cwm--set-and-recenter-windows
   :type 'integer)
 
@@ -66,6 +67,7 @@
   nil
   "Whether or not use experimental vertical padding."
   :group 'centered-window-mode
+  :initialize #'custom-initialize-default
   :set #'cwm--set-and-recenter-windows
   :type 'boolean)
 
@@ -73,6 +75,7 @@
   70
   "Frame internal border to use when vertical padding is used."
   :group 'centered-window-mode
+  :initialize #'custom-initialize-default
   :set #'cwm--set-and-recenter-windows
   :type 'integer)
 
@@ -81,6 +84,7 @@
   "Ratio by which the left fringe is padded more than the right.
 Should be a value between 0 and 100. A value of 0 means off."
   :group 'centered-window-mode
+  :initialize #'custom-initialize-default
   :set #'cwm--set-and-recenter-windows
   :type '(integer
           :validate (lambda (widget)
