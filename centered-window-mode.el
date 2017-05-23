@@ -7,6 +7,7 @@
 ;;    Pierre Lecocq   <https://github.com/pierre-lecocq>
 ;;    Syohei YOSHIDA  <https://github.com/syohex>
 ;;    Lars Tveito     <https://github.com/larstvei>
+;;    Tianxiang Xiong <https://github.com/xiongtx>
 ;; Keywords: faces windows
 ;; URL: https://github.com/anler/centered-window-mode
 ;; Package-Requires: ((emacs "24.4"))
