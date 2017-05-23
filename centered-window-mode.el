@@ -1,7 +1,7 @@
 ;;; centered-window-mode.el --- Center the text when there's only one window  -*- lexical-binding: t; -*-
 ;;
 ;; Author: Anler Hernández Peral <inbox+emacs@anler.me>
-;; Version: 1.3.0
+;; Version: 1.4.0
 ;; Contributors:
 ;;    Mickael Kerjean <https://github.com/mickael-kerjean>
 ;;    Pierre Lecocq   <https://github.com/pierre-lecocq>
