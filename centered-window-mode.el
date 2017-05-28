@@ -48,6 +48,8 @@
   (require 'cl-lib))
 (require 'face-remap)
 (require 'subr-x)
+(require 'mac-win nil t)
+(require 'mwheel nil t)
 
 (defgroup centered-window-mode nil
   "Center text in windows."
@@ -170,12 +172,14 @@ by this function."
   (add-hook 'window-configuration-change-hook #'cwm-center-windows)
   (cwm-center-windows)
   (when cwm-use-vertical-padding
-    (set-frame-parameter nil 'internal-border-width cwm-frame-internal-border)))
+    (set-frame-parameter nil 'internal-border-width cwm-frame-internal-border))
+  (cwm-bind-fringe-mouse-events))
 
 (defun cwm-turn-off ()
   (remove-hook 'window-configuration-change-hook #'cwm-center-windows)
   (cwm-center-windows)
-  (set-frame-parameter nil 'internal-border-width 0))
+  (set-frame-parameter nil 'internal-border-width 0)
+  (cwm-unbind-fringe-mouse-events))
 
 (defun cwm-center-windows ()
   (let ((windows (window-list nil :exclude-minibuffer)))
@@ -219,6 +223,44 @@ by this function."
          (left-width (* pixel (if (> n 0) (+ n ratio) n)))
          (right-width (* pixel (if (> n 0) (- n ratio) n))))
     `(,left-width . ,right-width)))
+
+(defun cwm-toggle-bind-fringe-mouse-events (&optional bind direction-command-alist)
+  (dolist (fringe '("left" "right"))
+    (dolist (wheel-speed '("" "double" "triple"))
+      (dolist (scroll-direction '("left" "right" "up" "down"))
+        (let ((key-name (kbd (concat
+                              "<" fringe "-fringe> "
+                              "<" wheel-speed
+                              (if (string= wheel-speed "") "" "-")
+                              "wheel-" scroll-direction ">"))))
+          (if bind
+              (global-set-key key-name
+                              (alist-get (intern-soft scroll-direction)
+                                         direction-command-alist))
+            (global-unset-key key-name)))))))
+
+(defun cwm-bind-fringe-mouse-events ()
+  (cond ((and (eq window-system 'mac) (featurep 'mac-win))
+         (cwm-toggle-bind-fringe-mouse-events
+          t
+          '((left  . mac-mwheel-scroll)
+            (right . mac-mwheel-scroll)
+            (up    . mac-mwheel-scroll)
+            (down  . mac-mwheel-scroll))))
+        ((eq window-system nil) nil)
+        (t
+         (cwm-toggle-bind-fringe-mouse-events
+          t
+          '((left  . mwheel-scroll)
+            (right . mwheel-scroll)
+            (up    . mwheel-scroll)
+            (down  . mwheel-scroll))))))
+
+(defun cwm-unbind-fringe-mouse-events ()
+  (cond ((and (eq window-system 'mac) (featurep 'mac-win))
+         (cwm-toggle-bind-fringe-mouse-events nil))
+        ((eq window-system nil) nil)
+        (t (cwm-toggle-bind-fringe-mouse-events nil))))
 
 ;;;###autoload
 (defun centered-window-mode-toggle ()
