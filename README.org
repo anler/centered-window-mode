@@ -54,6 +54,9 @@ To make this permanent, add this to your emacs configuration file:
 
 Adding vertical padding to an Emacs window is kind of hard, I have tried a lot of different solutions but most of them add a lot of complexity and source of bugs to the mode. Currently there are the options =cwm-use-vertical-padding= (default =nil=, set to =t= if you want this feature) and =cwm-frame-internal-border= (default =70=) to add some padding to the frame, it's far from ideal but I have found it at most acceptable for most of the use cases where I need this feature.
 
+* Customization
+  Once installed you can easily customize the mode use Emacs'
+  customization mechanism: =M-x customize-group<RET>centered-window-mode=
 * License
 
 Copyleft (ɔ) Anler Hernández Peral
