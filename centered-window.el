@@ -1,4 +1,4 @@
-;;; centered-window-mode.el --- Center the text when there's only one window  -*- lexical-binding: t; -*-
+;;; centered-window.el --- Center the text when there's only one window  -*- lexical-binding: t; -*-
 ;;
 ;; Author: Anler Hernández Peral <inbox+emacs@anler.me>
 ;; Version: 1.4.0
@@ -51,7 +51,7 @@
 (require 'mac-win nil t)
 (require 'mwheel nil t)
 
-(defgroup centered-window-mode nil
+(defgroup centered-window nil
   "Center text in windows."
   :group 'windows
   :prefix "cwm-")
@@ -59,13 +59,13 @@
 (defcustom cwm-lighter
   " #"
   "Mode's lighter used in the mode line."
-  :group 'centered-window-mode
+  :group 'centered-window
   :type 'string)
 
 (defcustom cwm-centered-window-width
   110
   "Minimum line length required to apply the margins."
-  :group 'centered-window-mode
+  :group 'centered-window
   :initialize #'custom-initialize-default
   :set #'cwm--set-and-recenter-windows
   :type 'integer)
@@ -73,19 +73,19 @@
 (defcustom cwm-incremental-padding
   nil
   "If t even when the window's width is less than `cwm-centered-window-width' a padding of `cwm-incremental-padding-%' will be applied to each side."
-  :group 'centered-window-mode
+  :group 'centered-window
   :type 'boolean)
 
 (defcustom cwm-incremental-padding-%
 	0
   "Incremental padding percentage to use when `cwm-incremental-padding' is t."
-  :group 'centered-window-mode
+  :group 'centered-window
   :type 'integer)
 
 (defcustom cwm-use-vertical-padding
   nil
   "Whether or not use experimental vertical padding."
-  :group 'centered-window-mode
+  :group 'centered-window
   :initialize #'custom-initialize-default
   :set #'cwm--set-and-recenter-windows
   :type 'boolean)
@@ -93,7 +93,7 @@
 (defcustom cwm-frame-internal-border
   5
   "Frame internal border to use when vertical padding is used."
-  :group 'centered-window-mode
+  :group 'centered-window
   :initialize #'custom-initialize-default
   :set #'cwm--set-and-recenter-windows
   :type 'integer)
@@ -102,7 +102,7 @@
   0
   "Ratio by which the left fringe is padded more than the right.
 Should be a value between 0 and 100. A value of 0 means off."
-  :group 'centered-window-mode
+  :group 'centered-window
   :initialize #'custom-initialize-default
   :set #'cwm--set-and-recenter-windows
   :type '(integer
@@ -117,7 +117,7 @@ Should be a value between 0 and 100. A value of 0 means off."
   "List of predicate functions.
 Each is run with current buffer and if it returns 't the
 mode won't activate in that buffer."
-  :group 'centered-window-mode
+  :group 'centered-window
   :type '(list function))
 
 (define-obsolete-variable-alias
@@ -126,7 +126,7 @@ mode won't activate in that buffer."
 (defcustom cwm-hooks
   nil
   "Hooks to run every time window is centered (be careful)."
-  :group 'centered-window-mode
+  :group 'centered-window
   :type 'hook)
 
 (defun cwm--set-and-recenter-windows (var val)
@@ -277,4 +277,5 @@ by this function."
   (if centered-window-mode (cwm-turn-on) (cwm-turn-off)))
 
 (provide 'centered-window-mode)
-;;; centered-window-mode.el ends here
+(provide 'centered-window)
+;;; centered-window.el ends here
