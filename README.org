@@ -1,3 +1,5 @@
+*NOTE*: Due to a lack of time to solve the issues of this project and the responsabilities derived from my recent paternity, I'm looking for someone to transfer the ownership of the project and who's willing to keep working in it.
+
 * Centered Window Mode
 
   Global minor mode that centers the text of the window. If another
