@@ -34,7 +34,7 @@ If you use [[https://github.com/dimitri/el-get][el-get]], the emacs package mana
 If you use [[https://github.com/jwiegley/use-package][use-package]], simply add the following to your init file.
 
 #+BEGIN_SRC elisp
-(use-package centered-window-mode :ensure t)
+(use-package centered-window :ensure t)
 #+END_SRC
 
 * Activation
