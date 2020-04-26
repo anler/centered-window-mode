@@ -170,6 +170,7 @@ by this function."
 
 (defun cwm-turn-on ()
   (add-hook 'window-configuration-change-hook #'cwm-center-windows)
+  (add-hook 'window-size-change-functions #'cwm-center-windows-frame)
   (cwm-center-windows)
   (when cwm-use-vertical-padding
     (set-frame-parameter nil 'internal-border-width cwm-frame-internal-border))
@@ -177,9 +178,14 @@ by this function."
 
 (defun cwm-turn-off ()
   (remove-hook 'window-configuration-change-hook #'cwm-center-windows)
+  (remove-hook 'window-size-change-functions #'cwm-center-windows-frame)
   (cwm-center-windows)
   (set-frame-parameter nil 'internal-border-width 0)
   (cwm-unbind-fringe-mouse-events))
+
+(defun cwm-center-windows-frame (frame)
+  (when (frame-size-changed-p frame)
+    (cwm-center-windows)))
 
 (defun cwm-center-windows ()
   (let ((windows (window-list nil :exclude-minibuffer)))
