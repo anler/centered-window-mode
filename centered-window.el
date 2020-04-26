@@ -169,6 +169,7 @@ by this function."
    `(fringe ((t (:background ,(face-attribute 'default :background)))))))
 
 (defun cwm-turn-on ()
+  (add-hook 'window-configuration-change-hook #'cwm-center-windows)
   (add-hook 'window-size-change-functions #'cwm-center-windows-frame)
   (cwm-center-windows)
   (when cwm-use-vertical-padding
@@ -176,6 +177,7 @@ by this function."
   (cwm-bind-fringe-mouse-events))
 
 (defun cwm-turn-off ()
+  (remove-hook 'window-configuration-change-hook #'cwm-center-windows)
   (remove-hook 'window-size-change-functions #'cwm-center-windows-frame)
   (cwm-center-windows)
   (set-frame-parameter nil 'internal-border-width 0)
