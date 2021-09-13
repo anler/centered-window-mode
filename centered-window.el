@@ -221,17 +221,17 @@ by this function."
          (pixel (frame-char-width (window-frame window)))
          (window-width (window-total-width window))
          (n  (if mode-active-p
-                 (max
-                  (/ (- window-width cwm-centered-window-width)
-                     2)
-                  (if cwm-incremental-padding
-                      (/ (* window-width cwm-incremental-padding-%)
-                         100)
-                    0))
-               nil))
+               (max
+                (/ (- window-width cwm-centered-window-width)
+                   2)
+                (if cwm-incremental-padding
+                    (/ (* window-width cwm-incremental-padding-%)
+                       100)
+                  0))
+               0))
          (ratio (/ (* n cwm-left-fringe-ratio) 100))
-         (left-width (* pixel (if (and n (> n 0)) (+ n ratio) n)))
-         (right-width (* pixel (if (and n (> n 0)) (- n ratio) n))))
+         (left-width (and mode-active-p (* pixel (if (> n 0) (+ n ratio) n))))
+         (right-width (and mode-active-p (* pixel (if (> n 0) (- n ratio) n)))))
     `(,left-width . ,right-width)))
 
 (defun cwm-toggle-bind-fringe-mouse-events (&optional bind direction-command-alist)
